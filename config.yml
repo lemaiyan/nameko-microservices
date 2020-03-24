@@ -1,0 +1,14 @@
+WEB_SERVER_ADDRESS: '0.0.0.0:5000'
+AUTORELOAD: true
+AMQP_URI: amqp://${RABBIT_USER:guest}:${RABBIT_PASSWORD:guest}@${RABBIT_HOST:localhost}:${RABBIT_PORT:5672}/
+REDIS_URIS:
+  development: redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}/${REDIS_INDEX:0}
+
+LOGGING:
+  version: 1
+  handlers:
+    console:
+      class: logging.StreamHandler
+  root:
+    level: DEBUG
+    handlers: [console]

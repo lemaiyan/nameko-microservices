@@ -1,0 +1,5 @@
+nameko==2.12.0
+ipython
+pytest
+nameko_redis
+nameko-structlog

@@ -1,0 +1,76 @@
+version: "3.7"
+services:
+  rabbitmq:
+    container_name: star-trek-rabbitmq
+    image: rabbitmq:alpine
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  redis_ship:
+    container_name: st-ship-redis
+    image: redis:alpine
+
+  redis_crew:
+    container_name: st-crew-redis
+    image: redis:alpine
+
+  ship_service:
+    container_name: st-ship-service
+    build: .
+    command: ./ship.sh
+    depends_on:
+      - redis_ship
+      - rabbitmq
+    links:
+      - redis_ship
+      - rabbitmq
+    volumes:
+      - .:/var/app
+    environment:
+      - RABBIT_PASSWORD=guest
+      - RABBIT_USER=guest
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - REDIS_HOST=redis_ship
+      - REDIS_PORT=6379
+      - REDIS_INDEX=0
+
+
+  crew_service:
+    container_name: st-crew-service
+    build: .
+    command: ./crew.sh
+    depends_on:
+      - redis_crew
+      - rabbitmq
+    links:
+      - redis_crew
+      - rabbitmq
+    volumes:
+      - .:/var/app
+    environment:
+      - RABBIT_PASSWORD=guest
+      - RABBIT_USER=guest
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - REDIS_HOST=redis_crew
+      - REDIS_PORT=6379
+      - REDIS_INDEX=1
+
+  star_trek_service:
+    container_name: st-service
+    build: .
+    ports:
+      - 5000:5000
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    volumes:
+      - .:/var/app
+    environment:
+      - RABBIT_PASSWORD=guest
+      - RABBIT_USER=guest
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
